@@ -21,6 +21,9 @@ var mongoClient = Client{
 	client: nil,
 }
 
+func seed(c *mongo.Client) {
+}
+
 /*Init MongoDB Conncetion */
 func Init() {
 	if mongoClient.client != nil {
@@ -53,7 +56,6 @@ func Init() {
 	mongoClient.client = c
 
 	fmt.Println("mongoClient", mongoClient)
-
 }
 
 // GetClient return client mongodb
