@@ -1,14 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	MongoClient "github.com/tayalone/go-mongodb/mongo"
 )
 
 func main() {
@@ -19,27 +16,36 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	mongoUser := os.Getenv("MONGO_USER")
-	if mongoUser == "" {
-		log.Fatalln("MONGO_USER unset")
+	MongoClient.Init()
+
+	client, errMongoClient := MongoClient.GetClient()
+
+	if errMongoClient != nil {
+		log.Fatalln("errMongoClient", errMongoClient.Error())
 	}
+	client.Deconnect()
 
-	mongoPassword := os.Getenv("MONGO_PASSWORD")
-	if mongoPassword == "" {
-		log.Fatalln("MONGO_PASSWORD unset")
-	}
+	// mongoUser := os.Getenv("MONGO_USER")
+	// if mongoUser == "" {
+	// 	log.Fatalln("MONGO_USER unset")
+	// }
 
-	mongoEndpoint := os.Getenv("MONGO_ENDPOINT")
-	if mongoEndpoint == "" {
-		log.Fatalln("MONGO_ENDPOINT unset")
-	}
+	// mongoPassword := os.Getenv("MONGO_PASSWORD")
+	// if mongoPassword == "" {
+	// 	log.Fatalln("MONGO_PASSWORD unset")
+	// }
 
-	uri := fmt.Sprintf("mongodb+srv://%s:%s@%s?retryWrites=true&w=majority", mongoUser, mongoPassword, mongoEndpoint)
+	// mongoEndpoint := os.Getenv("MONGO_ENDPOINT")
+	// if mongoEndpoint == "" {
+	// 	log.Fatalln("MONGO_ENDPOINT unset")
+	// }
 
-	_, errMgConnect := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	// uri := fmt.Sprintf("mongodb+srv://%s:%s@%s?retryWrites=true&w=majority", mongoUser, mongoPassword, mongoEndpoint)
 
-	if errMgConnect != nil {
-		log.Fatalln(errMgConnect.Error())
-	}
+	// _, errMgConnect := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+
+	// if errMgConnect != nil {
+	// 	log.Fatalln(errMgConnect.Error())
+	// }
 
 }
