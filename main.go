@@ -13,6 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	MongoClient "github.com/tayalone/go-mongodb/mongo"
+	"github.com/tayalone/go-mongodb/todo"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
@@ -32,17 +34,40 @@ func main() {
 	}
 
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
+
+	r.GET("/todos", func(ctx *gin.Context) {
+		var todos []todo.Domain
+
+		coll := client.GetCollection("todos")
+
+		cursor, err := coll.Find(ctx, bson.M{})
+		if err != nil {
+			panic(err)
+		}
+		if err = cursor.All(ctx, &todos); err != nil {
+			panic(err)
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "OK",
+			"todos":   todos,
+		})
+
+	})
+
+	r.GET("/pinga", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
+	// r.Run(":3000") // listen and serve on 0.0.0.0:8080
 
 	srv := &http.Server{
-		Addr:    ":8081", // listen and serve on 0.0.0.0:8081 (for windows "localhost:8080")
+		Addr:    ":3000",
 		Handler: r,
 	}
 
+	// // run srv in goroutine
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("listen: %s\n", err)
@@ -75,5 +100,7 @@ func main() {
 		log.Fatal("App forced to shutdown:", err)
 	}
 	client.Deconnect()
+
+	log.Println("App exiting")
 
 }

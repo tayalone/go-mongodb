@@ -15,13 +15,12 @@ import (
 /*Client is Struct Of MongoConnector*/
 type Client struct {
 	client *mongo.Client
+	db     *mongo.Database
 }
 
 var mongoClient = Client{
 	client: nil,
-}
-
-func seed(c *mongo.Client) {
+	db:     nil,
 }
 
 /*Init MongoDB Conncetion */
@@ -53,9 +52,13 @@ func Init() {
 	if errMgConnect != nil {
 		log.Fatalln(errMgConnect.Error())
 	}
+	db := c.Database("test-with-golang")
+
 	mongoClient.client = c
+	mongoClient.db = db
 
 	fmt.Println("mongoClient", mongoClient)
+	// seed(db)
 }
 
 // GetClient return client mongodb
@@ -81,4 +84,9 @@ func (c *Client) Deconnect() error {
 		return nil
 	}
 	return errors.New("Not Connect")
+}
+
+/*GetCollection retrive mongo collection*/
+func (c *Client) GetCollection(collName string) *mongo.Collection {
+	return c.db.Collection(collName)
 }

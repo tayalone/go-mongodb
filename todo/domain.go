@@ -8,9 +8,9 @@ import (
 
 // Domain of Todo
 type Domain struct {
-	ID        primitive.ObjectID `bson:"_id" json:"_id"`
-	Task      string             `bson:"task" json:"task"`
-	Done      bool               `bson:"done" json:"done"`
-	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
-	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+	Task      string             `bson:"task,omitempty" json:"task,omitempty"`
+	Completed bool               `bson:"completed" json:"completed"`
+	CreatedAt time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	UpdatedAt time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
 }
