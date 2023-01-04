@@ -55,6 +55,30 @@ func main() {
 
 	})
 
+	r.GET("/todos/filter", func(ctx *gin.Context) {
+
+		filter := bson.D{{Key: "completed", Value: false}}
+
+		var todos []todo.Domain
+
+		coll := client.GetCollection("todos")
+
+		cursor, err := coll.Find(context.TODO(), filter)
+
+		if err != nil {
+			panic(err)
+		}
+		if err = cursor.All(ctx, &todos); err != nil {
+			panic(err)
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "OK",
+			"todos":   todos,
+		})
+
+	})
+
 	r.GET("/pinga", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
