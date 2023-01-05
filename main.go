@@ -14,7 +14,9 @@ import (
 	"github.com/joho/godotenv"
 	MongoClient "github.com/tayalone/go-mongodb/mongo"
 	"github.com/tayalone/go-mongodb/todo"
+	TodoDTO "github.com/tayalone/go-mongodb/todo/dto"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
 
 	r := gin.Default()
 
-	r.GET("/todos", func(ctx *gin.Context) {
+	r.GET("/todo", func(ctx *gin.Context) {
 		var todos []todo.Domain
 
 		coll := client.GetCollection("todos")
@@ -52,38 +54,79 @@ func main() {
 			"message": "OK",
 			"todos":   todos,
 		})
-
 	})
 
-	r.GET("/todos/filter", func(ctx *gin.Context) {
+	r.GET("/todo/:id", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "OK",
+		})
+	})
 
-		filter := bson.D{{Key: "completed", Value: false}}
+	r.POST("/todo", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "OK",
+		})
+	})
 
-		var todos []todo.Domain
+	r.PATCH("/todo/:id", func(ctx *gin.Context) {
+		var gi TodoDTO.GetId
 
-		coll := client.GetCollection("todos")
-
-		cursor, err := coll.Find(context.TODO(), filter)
-
-		if err != nil {
-			panic(err)
+		if err := ctx.ShouldBindUri(&gi); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+			return
 		}
-		if err = cursor.All(ctx, &todos); err != nil {
-			panic(err)
+
+		objID, err := primitive.ObjectIDFromHex(gi.ID)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+			return
+		}
+
+		var i TodoDTO.Update
+		if err := ctx.ShouldBindJSON(&i); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "OK",
-			"todos":   todos,
-		})
-
-	})
-
-	r.GET("/pinga", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"input":   i,
+			"objID":   objID,
 		})
 	})
+
+	r.DELETE("/todo/:id", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "OK",
+		})
+	})
+
+	// r.GET("/todos/filter", func(ctx *gin.Context) {
+	// 	filter := bson.D{{Key: "completed", Value: false}}
+
+	// 	var todos []todo.Domain
+
+	// 	coll := client.GetCollection("todos")
+
+	// 	cursor, err := coll.Find(context.TODO(), filter)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	if err = cursor.All(ctx, &todos); err != nil {
+	// 		panic(err)
+	// 	}
+
+	// 	ctx.JSON(http.StatusOK, gin.H{
+	// 		"message": "OK",
+	// 		"todos":   todos,
+	// 	})
+	// })
+
+	// r.GET("/ping", func(c *gin.Context) {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"message": "pong",
+	// 	})
+	// })
 	// r.Run(":3000") // listen and serve on 0.0.0.0:8080
 
 	srv := &http.Server{
@@ -126,5 +169,4 @@ func main() {
 	client.Deconnect()
 
 	log.Println("App exiting")
-
 }

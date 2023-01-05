@@ -1,0 +1,36 @@
+
+@hostname = http://localhost
+@port = 3000
+
+GET {{hostname}}:{{port}}/todo HTTP/1.1
+####
+
+
+
+GET {{hostname}}:{{port}}/todo/1 HTTP/1.1
+####
+
+
+POST {{hostname}}:{{port}}/todo/ HTTP/1.1
+content-type: application/json
+
+{
+
+}
+###
+
+PATCH {{hostname}}:{{port}}/todo/63b4ea55336d7acfcc0b7417 HTTP/1.1
+content-type: application/json
+
+{
+    "completed": false
+}
+###
+
+DELETE {{hostname}}:{{port}}/todo/1 HTTP/1.1
+content-type: application/json
+
+{
+
+}
+###
