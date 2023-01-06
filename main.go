@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -42,7 +43,14 @@ func main() {
 
 		coll := client.GetCollection("todos")
 
-		cursor, err := coll.Find(ctx, bson.M{})
+		// / ค้นหาด้วยเวลา
+		theTime, err := time.Parse("2023-01-03T02:54:13.952Z", "2023-01-03T02:54:13.952Z")
+
+		filter := bson.D{{Key: "createdAt", Value: bson.D{{Key: "$gte", Value: theTime}}}}
+
+		fmt.Println(theTime)
+
+		cursor, err := coll.Find(ctx, filter)
 		if err != nil {
 			panic(err)
 		}
@@ -87,6 +95,12 @@ func main() {
 			ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 			return
 		}
+
+		// tmp := bson.D{{Key: "$set", Value: bson.M{"someString": "The Updated String"}}}
+		// tmp = append(tmp, bson.E{Key: "$unset", Value: bson.M{"someString": "The Updated String"}})
+
+		x := time.Date(2009, 11, 17, 0, 0, 0, 0, time.Local)
+		fmt.Println(x)
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "OK",

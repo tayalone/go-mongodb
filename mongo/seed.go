@@ -52,5 +52,5 @@ func seed(db *mongo.Database) {
 	for _, id := range results.InsertedIDs {
 		fmt.Printf("\t%s\n", id)
 	}
-
+	// coll.UpdateByID()
 }
